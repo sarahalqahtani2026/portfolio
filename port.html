@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sarah Mohammed Alqahtani | AI & Computer Science</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Space+Grotesk:wght@400;600;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        // Force scroll to top on refresh before page renders
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        arabic: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff', 300: '#d8b4fe',
+                            400: '#c084fc', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce',
+                            800: '#6b21a8', 900: '#581c87',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'blob': 'blob 7s infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #1f2937;
+            overflow-x: hidden;
+            cursor: none;
+            transition: font-family 0.3s ease;
+        }
+        
+        /* Language Toggle Logic */
+        html[lang="en"] .ar { display: none !important; }
+        html[lang="ar"] .en { display: none !important; }
+        html[lang="ar"] body { font-family: 'Tajawal', sans-serif; }
+        html[lang="ar"] .font-display { font-family: 'Tajawal', sans-serif; }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(147, 51, 234, 0.1);
+        }
+
+        .glass-purple {
+            background: rgba(147, 51, 234, 0.05);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(147, 51, 234, 0.2);
+        }
+
+        /* Accelerated GPU Cursor Styles - Hidden on touch devices */
+        @media (pointer: fine) {
+            #cursor {
+                position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+                border: 2px solid #581c87; border-radius: 50%; pointer-events: none;
+                z-index: 9999; will-change: transform, width, height, background-color, border-color;
+                transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+            }
+            #cursor-dot {
+                position: fixed; top: 0; left: 0; width: 6px; height: 6px;
+                background-color: #581c87; border-radius: 50%; pointer-events: none;
+                z-index: 9999; will-change: transform;
+            }
+            .hover-effect:hover ~ #cursor, .cursor-hover-active {
+                width: 60px !important; height: 60px !important; 
+                background-color: rgba(168, 85, 247, 0.2) !important;
+                border-color: rgba(88, 28, 135, 0.4) !important; 
+                backdrop-filter: blur(2px);
+            }
+        }
+        @media (pointer: coarse) {
+            #cursor, #cursor-dot { display: none !important; }
+            body { cursor: auto; }
+        }
+
+        #network-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; opacity: 0.8; 
+        }
+
+        /* Reveal Animation using Intersection Observer */
+        .reveal {
+            opacity: 0; transform: translateY(40px) scale(0.98);
+            transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+            will-change: opacity, transform;
+        }
+        .reveal.active {
+            opacity: 1; transform: translateY(0) scale(1);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #faf5ff; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #c084fc, #7e22ce); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #a855f7, #6b21a8); }
+
+        .terminal-window {
+            background-color: #111827; border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden; position: relative;
+        }
+        .terminal-header { background-color: #1f2937; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-body { padding: 1.5rem; font-family: 'Courier New', Courier, monospace; color: #d1d5db; min-height: 200px; }
+        
+        .cursor-blink::after { content: '|'; animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .tilt-card-container { perspective: 1500px; }
+        .tilt-card { transform-style: preserve-3d; transition: transform 0.1s ease-out; will-change: transform; }
+        .tilt-content { transform: translateZ(50px); }
+        .tilt-bg { transform: translateZ(-20px) scale(1.05); }
+
+        .text-gradient {
+            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #7e22ce, #d8b4fe);
+        }
+
+        .neural-path {
+            position: absolute; top: 0; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to bottom, #d8b4fe, #9333ea, #d8b4fe);
+            background-size: 100% 200%; animation: flow 3s linear infinite;
+        }
+        @keyframes flow { 0% { background-position: 0% 0%; } 100% { background-position: 0% 100%; } }
+        
+        /* Navbar Performance Transitions */
+        #navbar {
+            transition: background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            will-change: background, backdrop-filter, box-shadow;
+        }
+
+        /* Mobile Menu Styles */
+        #mobile-menu {
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #mobile-menu.active {
+            max-height: 400px;
+            opacity: 1;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            border-top: 1px solid rgba(147, 51, 234, 0.1);
+            margin-top: 0.5rem;
+        }
+
+        /* التفاعل الذكي لشريط التنقل مع الخلفيات الداكنة */
+        #navbar-container.navbar-dark-mode #navbar {
+            background: rgba(17, 24, 39, 0.85) !important;
+            backdrop-filter: blur(16px) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4) !important;
+        }
+        #navbar-container.navbar-dark-mode a.text-gray-700, #navbar-container.navbar-dark-mode .mobile-link {
+            color: #e5e7eb !important;
+        }
+        #navbar-container.navbar-dark-mode a.text-gray-700:hover, #navbar-container.navbar-dark-mode .mobile-link:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+        }
+        #navbar-container.navbar-dark-mode .text-brand-900 {
+            color: #ffffff !important;
+        }
+        #navbar-container.navbar-dark-mode .fa-microchip {
+            color: #d8b4fe !important;
+        }
+        #navbar-container.navbar-dark-mode .fa-brain {
+            color: #c084fc !important;
+        }
+        #navbar-container.navbar-dark-mode button#lang-btn {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            color: #e5e7eb !important;
+        }
+        #navbar-container.navbar-dark-mode button#lang-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+        }
+        #navbar-container.navbar-dark-mode #mobile-menu-btn {
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-300 selection:text-brand-900 font-sans">
+
+    <canvas id="network-canvas"></canvas>
+
+    <div class="fixed top-0 start-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] start-[-10%] w-[500px] h-[500px] bg-brand-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob"></div>
+        <div class="absolute top-[30%] end-[-10%] w-[400px] h-[400px] bg-brand-400 rounded-full mix-blend-multiply filter blur-[80px] opacity-30 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-20%] start-[20%] w-[600px] h-[600px] bg-brand-200 rounded-full mix-blend-multiply filter blur-[120px] opacity-50 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <div id="cursor"></div>
+    <div id="cursor-dot"></div>
+
+    <nav class="fixed w-full z-[100] top-2 px-3 md:px-6 pointer-events-none" id="navbar-container">
+        <div class="max-w-7xl mx-auto glass rounded-3xl md:rounded-full px-4 md:px-6 py-2.5 flex flex-col pointer-events-auto shadow-[0_8px_32px_rgba(147,51,234,0.1)] border-white/50" id="navbar" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);">
+            
+            <div class="flex justify-between items-center w-full">
+                <a href="#" class="font-display font-bold text-lg md:text-2xl text-brand-900 hover-effect flex items-center gap-2 group/logo shrink-0">
+                    <div class="relative w-7 h-7 md:w-8 md:h-8 flex items-center justify-center overflow-hidden">
+                        <i class="fa-solid fa-microchip absolute text-brand-700 transition-all duration-500 transform group-hover/logo:-translate-y-8 group-hover/logo:opacity-0"></i>
+                        <i class="fa-solid fa-brain absolute text-brand-600 transition-all duration-500 transform translate-y-8 opacity-0 group-hover/logo:translate-y-0 group-hover/logo:opacity-100"></i>
+                    </div>
+                    <span class="en">Sarah Alqahtani</span>
+                    <span class="ar">سارة القحطاني</span>
+                </a>
+                
+                <div class="hidden lg:flex items-center gap-1">
+                    <a href="#about" class="px-5 py-2.5 rounded-full font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm transition-all duration-300 hover-effect text-sm tracking-wide">
+                        <span class="en">About</span><span class="ar">نبذة</span>
+                    </a>
+                    <a href="#experience" class="px-5 py-2.5 rounded-full font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm transition-all duration-300 hover-effect text-sm tracking-wide">
+                        <span class="en">Experience</span><span class="ar">الخبرات</span>
+                    </a>
+                    <a href="#projects" class="px-5 py-2.5 rounded-full font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm transition-all duration-300 hover-effect text-sm tracking-wide">
+                        <span class="en">Project</span><span class="ar">المشروع</span>
+                    </a>
+                    <a href="#skills" class="px-5 py-2.5 rounded-full font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm transition-all duration-300 hover-effect text-sm tracking-wide">
+                        <span class="en">Skills</span><span class="ar">المهارات</span>
+                    </a>
+                    <a href="#courses" class="px-5 py-2.5 rounded-full font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm transition-all duration-300 hover-effect text-sm tracking-wide">
+                        <span class="en">Certificates</span><span class="ar">الشهادات</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-2 md:gap-3 shrink-0">
+                    <button id="lang-btn" class="font-bold text-brand-700 hover:text-brand-900 transition-colors hover-effect bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 shadow-sm text-sm md:text-base">
+                        عربي
+                    </button>
+                    <a href="#contact" class="hidden md:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-600 to-brand-800 text-white rounded-full font-medium hover:shadow-[0_0_20px_rgba(147,51,234,0.4)] hover:-translate-y-0.5 transition-all duration-300 hover-effect group">
+                        <span class="en">Connect</span>
+                        <span class="ar">تواصل</span>
+                        <i class="fa-solid fa-paper-plane text-sm group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
+                    </a>
+                    <button id="mobile-menu-btn" class="lg:hidden text-brand-800 text-xl px-2 focus:outline-none hover-effect">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="mobile-menu" class="lg:hidden flex flex-col gap-2 w-full">
+                <a href="#about" class="mobile-link block px-4 py-2.5 rounded-xl font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-center">
+                    <span class="en">About</span><span class="ar">نبذة</span>
+                </a>
+                <a href="#experience" class="mobile-link block px-4 py-2.5 rounded-xl font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-center">
+                    <span class="en">Experience</span><span class="ar">الخبرات</span>
+                </a>
+                <a href="#projects" class="mobile-link block px-4 py-2.5 rounded-xl font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-center">
+                    <span class="en">Project</span><span class="ar">المشروع</span>
+                </a>
+                <a href="#skills" class="mobile-link block px-4 py-2.5 rounded-xl font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-center">
+                    <span class="en">Skills</span><span class="ar">المهارات</span>
+                </a>
+                <a href="#courses" class="mobile-link block px-4 py-2.5 rounded-xl font-bold text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-center">
+                    <span class="en">Certificates</span><span class="ar">الشهادات</span>
+                </a>
+                <a href="#contact" class="mobile-link block mt-2 px-4 py-3 bg-brand-600 text-white rounded-xl font-bold transition-colors text-center shadow-md">
+                    <span class="en">Connect With Me</span><span class="ar">تواصل معي</span>
+                </a>
+            </div>
+
+        </div>
+    </nav>
+
+    <section class="relative min-h-[100dvh] flex items-center justify-center pt-28 pb-12 overflow-hidden" id="about">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 relative z-10 w-full grid lg:grid-cols-12 gap-8 md:gap-12 items-center">
+            
+            <div class="text-start reveal lg:col-span-7">
+                <div class="inline-flex items-center px-4 py-2 rounded-full glass-purple border-brand-300/50 text-brand-800 font-semibold text-xs md:text-sm mb-6 md:mb-8 gap-3 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+                    <span class="relative flex h-2.5 w-2.5 md:h-3 md:w-3 shrink-0">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-full w-full bg-brand-600"></span>
+                    </span>
+                    <span class="en leading-tight">Career-ready graduate | Computer Science specialist, Intelligent Systems track</span>
+                    <span class="ar leading-tight">خريجة جاهزة لسوق العمل | متخصصة في علوم الحاسب، مسار الأنظمة الذكية</span>
+                </div>
+                
+                <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-4 md:mb-6 text-gray-900">
+                    <span class="en"><span class="text-gradient">Sarah Mohammed Alqahtani</span></span>
+                    <span class="ar"><span class="text-gradient">سارة محمد القحطاني</span></span>
+                </h1>
+                
+                <div class="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
+                    <div class="h-px bg-brand-300 w-8 md:w-12 shrink-0"></div>
+                    <h2 class="text-lg sm:text-xl md:text-2xl text-brand-700 font-bold font-display tracking-wide min-h-[28px] md:min-h-[40px] flex items-center">
+                        <span id="subtitle-typewriter" class="cursor-blink"></span>
+                    </h2>
+                </div>
+                
+                <div class="terminal-window mb-8 md:mb-10 w-full max-w-full md:max-w-2xl shadow-2xl hover-effect border border-gray-700 text-start" dir="ltr">
+                    <div class="terminal-header">
+                        <div class="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-red-500"></div>
+                        <div class="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-green-500"></div>
+                        <span class="text-gray-400 text-[10px] md:text-xs ms-2 font-mono">sarah@ai-core: ~/profile</span>
+                    </div>
+                    <div class="terminal-body text-xs md:text-sm lg:text-base leading-relaxed p-4 md:p-6">
+                        <span class="text-brand-400">sarah@ai-core</span><span class="text-white">:</span><span class="text-blue-400">~/profile</span><span class="text-white">$</span> 
+                        <span class="en">cat summary.txt</span>
+                        <span class="ar">cat summary.txt</span>
+                        <br><br>
+                        <span id="terminal-output" class="cursor-blink text-gray-300" style="display: block; min-height: 80px md:min-height: 100px;"></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-4 items-start sm:items-center mt-6">
+                    <a href="#projects" class="w-full sm:w-auto text-center px-6 md:px-8 py-3 md:py-3.5 bg-brand-900 text-white rounded-full font-medium hover:bg-brand-800 hover:shadow-[0_0_25px_rgba(88,28,135,0.4)] transition-all duration-300 hover-effect flex items-center justify-center gap-2 group">
+                        <span class="en">Explore Project</span>
+                        <span class="ar">استكشف المشروع</span>
+                        <i class="fa-solid fa-code-branch group-hover:rotate-90 transition-transform"></i>
+                    </a>
+
+                <a href="https://drive.google.com/file/d/1uJ5N4yjq-GI7sVJavufWh1O2bFscMlgn/view?usp=drivesdk" target="_blank" class="w-full sm:w-auto text-center px-6 md:px-8 py-3 md:py-3.5 bg-white text-brand-900 border border-brand-200 shadow-sm rounded-full font-medium hover:bg-brand-50 hover:shadow-[0_0_20px_rgba(147,51,234,0.15)] transition-all duration-300 hover-effect flex items-center justify-center gap-2 group">
+                        <span class="en">View CV</span>
+                        <span class="ar">السيرة الذاتية</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+
+                    <div class="flex gap-3 items-center justify-center w-full sm:w-auto mt-2 sm:mt-0 sm:ms-2">
+                        <a href="https://github.com/sarahalqahtani2026" target="_blank" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full border-2 border-brand-200 text-brand-800 hover:bg-brand-50 hover:border-brand-400 hover:-translate-y-1 transition-all duration-300 text-lg md:text-xl hover-effect shadow-sm">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/sarah-alqahtani-410820357" target="_blank" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full border-2 border-brand-200 text-brand-800 hover:bg-brand-50 hover:border-brand-400 hover:-translate-y-1 transition-all duration-300 text-lg md:text-xl hover-effect shadow-sm">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative hidden lg:flex justify-center items-center h-full reveal delay-200 lg:col-span-5">
+                <div class="relative w-[300px] h-[300px] xl:w-[400px] xl:h-[400px]">
+                    <div class="absolute inset-0 m-auto w-24 h-24 xl:w-32 xl:h-32 bg-white rounded-full shadow-[0_0_40px_rgba(168,85,247,0.4)] flex items-center justify-center z-20 border-4 border-brand-100 group hover-effect overflow-hidden">
+                        <i class="fa-solid fa-microchip absolute text-3xl xl:text-4xl text-brand-600 transition-all duration-500 transform group-hover:opacity-0 group-hover:scale-75"></i>
+                        <i class="fa-solid fa-brain absolute text-3xl xl:text-4xl text-brand-600 transition-all duration-500 transform opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-110"></i>
+                    </div>
+                    
+                    <div class="absolute inset-4 border border-brand-300/30 rounded-full animate-[spin_20s_linear_infinite]">
+                        <div class="absolute top-0 left-1/2 w-3 h-3 xl:w-4 xl:h-4 bg-brand-500 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_15px_rgba(168,85,247,0.8)]"></div>
+                    </div>
+                    <div class="absolute inset-10 xl:inset-12 border border-brand-400/20 rounded-full animate-[spin_15s_linear_infinite_reverse]">
+                        <div class="absolute bottom-0 left-1/2 w-2 h-2 xl:w-3 xl:h-3 bg-brand-400 rounded-full -translate-x-1/2 translate-y-1/2 shadow-[0_0_10px_rgba(192,132,252,0.8)]"></div>
+                    </div>
+                    <div class="absolute inset-16 xl:inset-20 border border-brand-200/40 rounded-full animate-[spin_25s_linear_infinite]">
+                        <div class="absolute left-0 top-1/2 w-1.5 h-1.5 xl:w-2 xl:h-2 bg-brand-600 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_8px_rgba(147,51,234,0.8)]"></div>
+                    </div>
+                    
+                    <svg class="absolute inset-0 w-full h-full opacity-30 animate-pulse" viewBox="0 0 100 100">
+                        <line x1="50" y1="50" x2="20" y2="20" stroke="#a855f7" stroke-width="0.5"/>
+                        <line x1="50" y1="50" x2="80" y2="80" stroke="#a855f7" stroke-width="0.5"/>
+                        <line x1="50" y1="50" x2="80" y2="20" stroke="#a855f7" stroke-width="0.5"/>
+                        <line x1="50" y1="50" x2="20" y2="80" stroke="#a855f7" stroke-width="0.5"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="py-16 md:py-24 relative max-w-6xl mx-auto px-4 md:px-6 reveal">
+        <div class="text-center mb-12 md:mb-16 relative">
+            <h2 class="font-display text-3xl md:text-4xl font-bold text-brand-900 mb-3 md:mb-4">
+                <span class="en">Academic & Professional Journey</span>
+                <span class="ar">الرحلة الأكاديمية والمهنية</span>
+            </h2>
+            <p class="text-gray-500 text-sm md:text-base max-w-2xl mx-auto px-4">
+                <span class="en">Tracing the neural pathways of my education and practical fieldwork.</span>
+                <span class="ar">تتبع المسارات العصبية لتعليمي الأكاديمي وعملي الميداني.</span>
+            </p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-8 md:gap-12 relative">
+            <div class="hidden md:block absolute left-1/2 right-auto -translate-x-1/2 top-0 bottom-0 w-1 bg-gray-100 rounded-full overflow-hidden">
+                <div class="neural-path"></div>
+            </div>
+
+            <div class="md:hidden absolute start-[28px] top-[40px] bottom-[40px] w-1 bg-gray-100 rounded-full overflow-hidden z-0 shadow-inner">
+                <div class="neural-path"></div>
+            </div>
+
+            <div class="w-full md:w-1/2 md:pe-12 relative group z-10">
+                <div class="hidden md:flex absolute end-[-26px] top-8 w-12 h-12 rounded-full bg-white border-4 border-brand-200 items-center justify-center z-10 shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover:border-brand-500 transition-colors">
+                    <i class="fa-solid fa-graduation-cap text-brand-600"></i>
+                </div>
+
+                <div class="glass bg-white/90 p-6 md:p-8 rounded-3xl md:rounded-[2rem] border border-brand-100 hover:border-brand-400 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl relative ms-12 md:ms-0 text-start z-10">
+                    <div class="md:hidden absolute -start-[38px] top-6 w-10 h-10 rounded-full bg-white border-4 border-brand-200 flex items-center justify-center z-10 shadow-sm group-hover:border-brand-500 transition-colors">
+                        <i class="fa-solid fa-graduation-cap text-brand-600 text-sm"></i>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                        <h4 class="text-xl md:text-2xl font-bold text-gray-800">
+                            <span class="en">Graduate</span>
+                            <span class="ar">متخرجة</span>
+                        </h4>
+                        <span class="bg-brand-50 text-brand-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-brand-200 shrink-0">
+                            <span class="en">2026</span>
+                            <span class="ar">2026</span>
+                        </span>
+                    </div>
+                    
+                    <h5 class="text-brand-600 font-semibold text-base md:text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-landmark shrink-0"></i>
+                        <span>
+                            <span class="en">King Khalid University</span>
+                            <span class="ar">جامعة الملك خالد</span>
+                        </span>
+                    </h5>
+                    
+                    <div class="space-y-3">
+                        <div class="inline-flex items-center gap-3 bg-white px-3 md:px-4 py-2.5 rounded-xl border border-brand-50 w-full text-start text-sm md:text-base shadow-sm">
+                            <i class="fa-solid fa-laptop-code text-brand-500 w-5 text-center shrink-0"></i>
+                            <span class="font-medium text-gray-700">
+                                <span class="en">Bachelor of Computer Science</span>
+                                <span class="ar">بكالوريوس علوم حاسب</span>
+                            </span>
+                        </div>
+                        <div class="inline-flex items-center gap-3 bg-white px-3 md:px-4 py-2.5 rounded-xl border border-brand-50 w-full text-start text-sm md:text-base shadow-sm">
+                            <i class="fa-solid fa-microchip text-brand-500 w-5 text-center shrink-0"></i>
+                            <span class="font-medium text-gray-700">
+                                <span class="en">Intelligent Systems Track</span>
+                                <span class="ar">مسار الأنظمة الذكية</span>
+                            </span>
+                        </div>
+                        <div class="inline-flex items-center gap-3 bg-white px-3 md:px-4 py-2.5 rounded-xl border border-brand-50 w-full text-gray-500 text-start text-sm md:text-base shadow-sm">
+                            <i class="fa-solid fa-chart-pie text-brand-400 w-5 text-center shrink-0"></i>
+                            <span class="font-medium">
+                                <span class="en">GPA: <span class="text-brand-700 font-bold">4.74</span></span>
+                                <span class="ar">المعدل التراكمي: <span class="text-brand-700 font-bold">4.74</span></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 md:ps-12 relative group mt-4 md:mt-32 z-10">
+                <div class="hidden md:flex absolute start-[-26px] top-8 w-12 h-12 rounded-full bg-white border-4 border-brand-200 items-center justify-center z-10 shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover:border-brand-500 transition-colors">
+                    <i class="fa-solid fa-briefcase text-brand-600"></i>
+                </div>
+
+                <div class="glass bg-white/90 p-6 md:p-8 rounded-3xl md:rounded-[2rem] border border-brand-100 hover:border-brand-400 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl relative ms-12 md:ms-0 text-start z-10">
+                    <div class="md:hidden absolute -start-[38px] top-6 w-10 h-10 rounded-full bg-white border-4 border-brand-200 flex items-center justify-center z-10 shadow-sm group-hover:border-brand-500 transition-colors">
+                        <i class="fa-solid fa-briefcase text-brand-600 text-sm"></i>
+                    </div>
+
+                    <h4 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">
+                        <span class="en">Trainee</span>
+                        <span class="ar">متدربة</span>
+                    </h4>
+                    <p class="text-brand-600 font-semibold text-base md:text-lg flex items-center gap-2 mb-5">
+                        <i class="fa-solid fa-building-columns shrink-0"></i> 
+                        <span class="en">Municipality of Ahad Rafidah</span>
+                        <span class="ar">بلدية أحد رفيدة</span>
+                    </p>
+                    
+                    <ul class="space-y-3 md:space-y-4 text-gray-600 list-none relative z-10 text-sm md:text-base">
+                        <li class="flex items-start gap-3 bg-white/60 p-3 rounded-xl border border-white hover:bg-white transition-colors shadow-sm">
+                            <div class="mt-0.5 w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-check text-brand-600 text-xs"></i></div>
+                            <span class="font-medium leading-relaxed">
+                                <span class="en">Assisted in administrative and technical tasks</span>
+                                <span class="ar">المساعدة في المهام الإدارية والفنية</span>
+                            </span>
+                        </li>
+                        <li class="flex items-start gap-3 bg-white/60 p-3 rounded-xl border border-white hover:bg-white transition-colors shadow-sm">
+                            <div class="mt-0.5 w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-users text-brand-600 text-xs"></i></div>
+                            <span class="font-medium leading-relaxed">
+                                <span class="en">Collaborated with team members in daily operations</span>
+                                <span class="ar">التعاون مع أعضاء الفريق في العمليات اليومية</span>
+                            </span>
+                        </li>
+                        <li class="flex items-start gap-3 bg-white/60 p-3 rounded-xl border border-white hover:bg-white transition-colors shadow-sm">
+                            <div class="mt-0.5 w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-comments text-brand-600 text-xs"></i></div>
+                            <span class="font-medium leading-relaxed">
+                                <span class="en">Gained practical workplace communication and organizational skills</span>
+                                <span class="ar">اكتساب مهارات التواصل التنظيمي والعملي في بيئة العمل</span>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-16 md:py-24 relative overflow-hidden reveal text-start">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-50/80 to-transparent -z-10"></div>
+        
+       <div class="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+            <div class="text-center mb-12 md:mb-16 relative">
+                <span class="inline-block py-1 px-3 rounded-md bg-brand-100 text-brand-700 font-bold tracking-widest uppercase text-[10px] md:text-xs mb-3 border border-brand-200 shadow-sm">
+                    <i class="fa-solid fa-star text-brand-500 mx-1"></i> 
+                    <span class="en">Showcase</span><span class="ar">أبرز الأعمال</span>
+                </span>
+                <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-extrabold mb-3 md:mb-4 text-brand-900">
+                    <span class="en">University Graduation Project</span>
+                    <span class="ar">مشروع التخرج الجامعي</span>
+                </h2>
+                <div class="w-24 md:w-32 h-1.5 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300 mx-auto rounded-full opacity-80"></div>
+            </div>
+
+            <div class="glass !bg-white/90 !border-brand-200 rounded-3xl md:rounded-[2.5rem] p-1 md:p-2 shadow-[0_20px_50px_rgba(147,51,234,0.15)] relative transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_rgba(147,51,234,0.25)]">
+                <div class="absolute inset-0 bg-gradient-to-br from-brand-50 to-white rounded-3xl md:rounded-[2.5rem] -z-10 overflow-hidden">
+                    <div class="absolute -top-32 -end-32 w-64 h-64 bg-brand-400 rounded-full filter blur-[80px] opacity-20"></div>
+                    <div class="absolute -bottom-32 -start-32 w-80 h-80 bg-brand-600 rounded-full filter blur-[100px] opacity-10"></div>
+                </div>
+                
+                <div class="grid lg:grid-cols-5 gap-0 rounded-[1.4rem] md:rounded-[2.2rem] overflow-hidden relative z-10">
+                    
+                    <div class="lg:col-span-2 relative h-[450px] border-b lg:border-b-0 lg:border-e border-brand-200 group overflow-hidden bg-gray-900 order-1">
+<img src="https://drive.google.com/thumbnail?id=1Hrv1OsS7vxeXoLLk1ZxT2xeNwfE9QORY&sz=w1000" alt="Facial Expression Analysis" class="absolute inset-0 w-full h-full object-cover object-[center_35%] opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 filter grayscale-[45%] contrast-125">
+                        <style>
+                            @keyframes scanFaceImage {
+                                0% { top: 0%; opacity: 0; }
+                                10% { opacity: 1; }
+                                90% { opacity: 1; }
+                                100% { top: 100%; opacity: 0; }
+                            }
+                            @keyframes smartTrack {
+                                0% { transform: translate(-50%, -50%) scale(1.02); }
+                                50% { transform: translate(-50%, -48%) scale(0.98); }
+                                100% { transform: translate(-50%, -50%) scale(1.02); }
+                            }
+                        </style>
+
+                       <div class="absolute inset-0 z-10 pointer-events-none">
+                            <div class="absolute inset-0 opacity-30 mix-blend-overlay" style="background-image: linear-gradient(rgba(192, 132, 252, 0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(192, 132, 252, 0.6) 1px, transparent 1px); background-size: 40px 40px;"></div>
+                            
+                            <div class="absolute top-[45%] left-1/2 w-[60%] h-[75%] border border-brand-400/50 rounded-lg shadow-[0_0_20px_rgba(200,85,247,0.3)]" style="animation: smartTrack 3s ease-in-out infinite;">
+                                <div class="absolute -top-1 -left-1 w-3 h-3 md:w-4 md:h-4 border-t-2 border-l-2 border-brand-300"></div>
+                                <div class="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 border-t-2 border-r-2 border-brand-300"></div>
+                                <div class="absolute -bottom-1 -left-1 w-3 h-3 md:w-4 md:h-4 border-b-2 border-l-2 border-brand-300"></div>
+                                <div class="absolute -bottom-1 -right-1 w-3 h-3 md:w-4 md:h-4 border-b-2 border-r-2 border-brand-300"></div>
+                            </div>
+                            
+                            <div class="absolute top-3 right-3 md:top-4 md:right-4 flex items-center gap-2 bg-black/60 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 rounded-full border border-white/20">
+                                <span class="flex h-1.5 w-1.5 md:h-2 md:w-2 relative">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 md:h-2 md:w-2 bg-green-500"></span>
+                                </span>
+                                <i class="fa-solid fa-microphone text-white text-[8px] md:text-[10px]"></i>
+                            </div>
+
+                            <div class="absolute left-0 w-full h-[2px] bg-brand-400 shadow-[0_0_25px_5px_rgba(216,180,254,0.9)]" style="animation: scanFaceImage 3s ease-in-out infinite;"></div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-3 p-6 md:p-12 relative flex flex-col justify-center bg-white/50 backdrop-blur-sm order-2">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-[10px] md:text-xs font-bold mb-4 uppercase tracking-wider w-max border border-brand-200">
+                            <i class="fa-solid fa-microchip"></i> 
+                            <span class="en">Intelligent Systems Track</span>
+                            <span class="ar">مسار الأنظمة الذكية</span>
+                        </div>
+                        
+                        <h3 class="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 mb-5 md:mb-6">
+                            <span class="en">Depression Detection System</span>
+                            <span class="ar">نظام الكشف عن الاكتئاب</span>
+                        </h3>
+                        
+                        <div class="space-y-4 md:space-y-6">
+                            <div class="flex gap-3 md:gap-4 group/item hover:-translate-y-1 transition-transform">
+                                <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-brand-50 flex items-center justify-center shrink-0 border border-brand-100 shadow-sm group-hover/item:border-brand-300 group-hover/item:bg-white transition-colors">
+                                    <i class="fa-solid fa-video text-brand-500 text-xl md:text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-gray-800 mb-1 text-base md:text-lg">
+                                        <span class="en">Video Analysis</span>
+                                        <span class="ar">تحليل الفيديو</span>
+                                    </h5>
+                                    <p class="text-gray-600 text-xs md:text-sm leading-relaxed">
+                                        <span class="en">Created an AI-based system for depression detection through video analysis.</span>
+                                        <span class="ar">إنشاء نظام يعتمد على الذكاء الاصطناعي للكشف عن الاكتئاب من خلال تحليل الفيديو.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 md:gap-4 group/item hover:-translate-y-1 transition-transform">
+                                <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-brand-50 flex items-center justify-center shrink-0 border border-brand-100 shadow-sm group-hover/item:border-brand-300 group-hover/item:bg-white transition-colors">
+                                    <i class="fa-solid fa-network-wired text-brand-500 text-xl md:text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-gray-800 mb-1 text-base md:text-lg">
+                                        <span class="en">CNN Architecture</span>
+                                        <span class="ar">معمارية الشبكات العصبية (CNN)</span>
+                                    </h5>
+                                    <p class="text-gray-600 text-xs md:text-sm leading-relaxed">
+                                        <span class="en">Implemented a Convolutional Neural Network (CNN) model to analyze behavioral indicators.</span>
+                                        <span class="ar">تنفيذ نموذج شبكة عصبية تلافيفية (CNN) لتحليل المؤشرات السلوكية.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 md:gap-4 group/item hover:-translate-y-1 transition-transform">
+                                <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-brand-50 flex items-center justify-center shrink-0 border border-brand-100 shadow-sm group-hover/item:border-brand-300 group-hover/item:bg-white transition-colors">
+                                    <i class="fa-solid fa-database text-brand-500 text-xl md:text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-gray-800 mb-1 text-base md:text-lg">
+                                        <span class="en">Data Processing & ML</span>
+                                        <span class="ar">معالجة البيانات وتعلم الآلة</span>
+                                    </h5>
+                                    <p class="text-gray-600 text-xs md:text-sm leading-relaxed">
+                                        <span class="en">Used Python and machine learning techniques for data processing and classification.</span>
+                                        <span class="ar">استخدام لغة Python وتقنيات تعلم الآلة لمعالجة البيانات والتصنيف.</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-16 md:py-24 relative max-w-7xl mx-auto px-4 md:px-6 reveal text-start">
+        <div class="text-center mb-12 md:mb-16 relative z-10">
+            <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-extrabold text-brand-900 mb-3 md:mb-4">
+                <span class="en">Skills</span>
+                <span class="ar">المهارات</span>
+            </h2>
+            <div class="w-24 md:w-32 h-1.5 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300 mx-auto rounded-full opacity-80"></div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 md:gap-12 relative z-10">
+            
+            <div class="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-white relative overflow-hidden group">
+                <div class="absolute -end-20 -top-20 w-64 h-64 bg-gradient-to-br from-brand-100 to-brand-300 rounded-full mix-blend-multiply opacity-30 group-hover:scale-[1.5] transition-transform duration-1000 ease-in-out blur-3xl"></div>
+                
+                <div class="flex items-center gap-4 md:gap-5 mb-8 md:mb-10 border-b border-gray-100 pb-4 md:pb-6 relative z-10">
+                    <div class="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center text-white shadow-lg shadow-brand-500/30 shrink-0">
+                        <div class="absolute inset-0 border border-white/20 rounded-2xl"></div>
+                        <i class="fa-solid fa-code text-xl md:text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-xl md:text-2xl font-bold text-gray-900">
+                            <span class="en">Technical Skills</span>
+                            <span class="ar">المهارات التقنية</span>
+                        </h3>
+                    </div>
+                </div>
+                
+              <style>
+                    @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+                    @keyframes scrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+                    .animate-scroll-left { animation: scrollLeft 20s linear infinite; }
+                    .animate-scroll-right { animation: scrollRight 20s linear infinite; }
+                    .pause-on-hover:hover .animate-scroll-left,
+                    .pause-on-hover:hover .animate-scroll-right { animation-play-state: paused; }
+                    .mask-edges { -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
+                </style>
+
+                <div class="relative z-10 overflow-hidden mask-edges pause-on-hover w-full" dir="ltr">
+                    <div class="flex flex-col gap-4 md:gap-5 py-2">
+                        <div class="flex gap-4 md:gap-5 w-max animate-scroll-left">
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-brands fa-python text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#3776AB] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">Python</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-brands fa-java text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#f89820] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">Java</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-brands fa-html5 text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#E34F26] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">HTML</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm text-center">
+                                    <i class="fa-solid fa-robot text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#ff6b6b] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base leading-tight mt-1">Machine Learning</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-brands fa-python text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#3776AB] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">Python</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-brands fa-java text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#f89820] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">Java</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-brands fa-html5 text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#E34F26] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">HTML</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm text-center">
+                                    <i class="fa-solid fa-robot text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#ff6b6b] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base leading-tight mt-1">Machine Learning</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 md:gap-5 w-max animate-scroll-right">
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-solid fa-database text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#4479A1] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">MySQL</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm text-center">
+                                    <i class="fa-brands fa-windows text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#00a4ef] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-[10px] md:text-sm leading-tight mt-1">Microsoft Office</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-brands fa-unity text-3xl md:text-4xl text-brand-500 group-hover/node:text-gray-900 transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">Unity</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm text-center">
+                                    <i class="fa-solid fa-network-wired text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#4ecdc4] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base leading-tight mt-1">Deep Learning</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-solid fa-database text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#4479A1] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">MySQL</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm text-center">
+                                    <i class="fa-brands fa-windows text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#00a4ef] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-[10px] md:text-sm leading-tight mt-1">Microsoft Office</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm">
+                                    <i class="fa-brands fa-unity text-3xl md:text-4xl text-brand-500 group-hover/node:text-gray-900 transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base">Unity</div>
+                                </div>
+                            </div>
+                            <div class="group/node relative p-[1px] rounded-2xl bg-gradient-to-b from-gray-200 to-gray-50 hover:from-brand-400 hover:to-brand-600 transition-colors duration-500 w-[140px] md:w-[160px] shrink-0">
+                                <div class="absolute inset-0 bg-brand-400/20 blur-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                                <div class="relative h-full bg-white p-4 md:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 overflow-hidden shadow-sm text-center">
+                                    <i class="fa-solid fa-network-wired text-3xl md:text-4xl text-brand-500 group-hover/node:text-[#4ecdc4] transition-colors duration-300 relative z-10 group-hover/node:-translate-y-1"></i>
+                                    <div class="font-bold text-gray-800 relative z-10 text-xs md:text-sm lg:text-base leading-tight mt-1">Deep Learning</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-white relative overflow-hidden group">
+                <div class="absolute -start-20 -bottom-20 w-64 h-64 bg-gradient-to-tr from-brand-200 to-brand-400 rounded-full mix-blend-multiply opacity-20 group-hover:scale-[1.5] transition-transform duration-1000 ease-in-out blur-3xl"></div>
+                
+                <div class="flex items-center gap-4 md:gap-5 mb-6 md:mb-8 border-b border-gray-100 pb-4 md:pb-6 relative z-10">
+                    <div class="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center text-white shadow-lg shadow-brand-500/30 shrink-0">
+                        <div class="absolute inset-0 border border-white/20 rounded-2xl"></div>
+                        <i class="fa-solid fa-users text-xl md:text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-xl md:text-2xl font-bold text-gray-900">
+                            <span class="en">Soft Skills</span>
+                            <span class="ar">المهارات الشخصية</span>
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-6 relative z-10 pt-2 md:pt-4">
+                    <div class="group/ring flex flex-col items-center p-3 md:p-4 bg-white rounded-2xl md:rounded-3xl border border-gray-100 hover:border-brand-300 hover:shadow-xl hover:-translate-y-1 md:hover:-translate-y-2 transition-all duration-300 active:scale-95 cursor-pointer">
+                        <div class="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mb-3 md:mb-4">
+                            <div class="absolute inset-1.5 bg-brand-50 rounded-[10px] md:rounded-[14px] transform rotate-45 opacity-80 group-hover/ring:bg-brand-100 transition-colors duration-500"></div>
+                            <div class="absolute inset-0 border-[2px] md:border-[3px] border-brand-400/40 rounded-[10px] md:rounded-[14px] animate-[spin_7s_linear_infinite] group-hover/ring:border-brand-500 transition-colors"></div>
+                            <div class="absolute inset-[3px] border-[1px] md:border-[2px] border-brand-200/60 rounded-[8px] md:rounded-[12px] animate-[spin_5s_linear_infinite_reverse] group-hover/ring:border-brand-400 transition-colors"></div>
+                            <i class="fa-regular fa-comments text-lg md:text-2xl text-brand-600 relative z-10 group-hover/ring:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-center text-[11px] md:text-sm mb-1 md:mb-3"><span class="en">Communication</span><span class="ar">التواصل</span></h4>
+                    </div>
+
+                    <div class="group/ring flex flex-col items-center p-3 md:p-4 bg-white rounded-2xl md:rounded-3xl border border-gray-100 hover:border-brand-300 hover:shadow-xl hover:-translate-y-1 md:hover:-translate-y-2 transition-all duration-300 active:scale-95 cursor-pointer">
+                        <div class="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mb-3 md:mb-4">
+                            <div class="absolute inset-1.5 bg-brand-50 rounded-[10px] md:rounded-[14px] transform rotate-45 opacity-80 group-hover/ring:bg-brand-100 transition-colors duration-500"></div>
+                            <div class="absolute inset-0 border-[2px] md:border-[3px] border-brand-400/40 rounded-[10px] md:rounded-[14px] animate-[spin_7s_linear_infinite_reverse] group-hover/ring:border-brand-500 transition-colors"></div>
+                            <div class="absolute inset-[3px] border-[1px] md:border-[2px] border-brand-200/60 rounded-[8px] md:rounded-[12px] animate-[spin_5s_linear_infinite] group-hover/ring:border-brand-400 transition-colors"></div>
+                            <i class="fa-solid fa-people-group text-lg md:text-2xl text-brand-600 relative z-10 group-hover/ring:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-center text-[11px] md:text-sm mb-1 md:mb-3"><span class="en">Teamwork</span><span class="ar">العمل الجماعي</span></h4>
+                    </div>
+
+                    <div class="group/ring flex flex-col items-center p-3 md:p-4 bg-white rounded-2xl md:rounded-3xl border border-gray-100 hover:border-brand-300 hover:shadow-xl hover:-translate-y-1 md:hover:-translate-y-2 transition-all duration-300 active:scale-95 cursor-pointer">
+                        <div class="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mb-3 md:mb-4">
+                            <div class="absolute inset-1.5 bg-brand-50 rounded-[10px] md:rounded-[14px] transform rotate-45 opacity-80 group-hover/ring:bg-brand-100 transition-colors duration-500"></div>
+                            <div class="absolute inset-0 border-[2px] md:border-[3px] border-brand-400/40 rounded-[10px] md:rounded-[14px] animate-[spin_6s_linear_infinite] group-hover/ring:border-brand-500 transition-colors"></div>
+                            <div class="absolute inset-[3px] border-[1px] md:border-[2px] border-brand-200/60 rounded-[8px] md:rounded-[12px] animate-[spin_8s_linear_infinite_reverse] group-hover/ring:border-brand-400 transition-colors"></div>
+                            <i class="fa-solid fa-puzzle-piece text-lg md:text-2xl text-brand-600 relative z-10 group-hover/ring:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-center text-[11px] md:text-sm mb-1 md:mb-3"><span class="en">Problem Solving</span><span class="ar">حل المشكلات</span></h4>
+                    </div>
+
+                    <div class="group/ring flex flex-col items-center p-3 md:p-4 bg-white rounded-2xl md:rounded-3xl border border-gray-100 hover:border-brand-300 hover:shadow-xl hover:-translate-y-1 md:hover:-translate-y-2 transition-all duration-300 active:scale-95 cursor-pointer">
+                        <div class="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mb-3 md:mb-4">
+                            <div class="absolute inset-1.5 bg-brand-50 rounded-[10px] md:rounded-[14px] transform rotate-45 opacity-80 group-hover/ring:bg-brand-100 transition-colors duration-500"></div>
+                            <div class="absolute inset-0 border-[2px] md:border-[3px] border-brand-400/40 rounded-[10px] md:rounded-[14px] animate-[spin_8s_linear_infinite_reverse] group-hover/ring:border-brand-500 transition-colors"></div>
+                            <div class="absolute inset-[3px] border-[1px] md:border-[2px] border-brand-200/60 rounded-[8px] md:rounded-[12px] animate-[spin_6s_linear_infinite] group-hover/ring:border-brand-400 transition-colors"></div>
+                            <i class="fa-solid fa-clock text-lg md:text-2xl text-brand-600 relative z-10 group-hover/ring:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-center text-[11px] md:text-sm mb-1 md:mb-3"><span class="en">Time Management</span><span class="ar">إدارة الوقت</span></h4>
+                    </div>
+
+                    <div class="group/ring flex flex-col items-center p-3 md:p-4 bg-white rounded-2xl md:rounded-3xl border border-gray-100 hover:border-brand-300 hover:shadow-xl hover:-translate-y-1 md:hover:-translate-y-2 transition-all duration-300 active:scale-95 cursor-pointer">
+                        <div class="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mb-3 md:mb-4">
+                            <div class="absolute inset-1.5 bg-brand-50 rounded-[10px] md:rounded-[14px] transform rotate-45 opacity-80 group-hover/ring:bg-brand-100 transition-colors duration-500"></div>
+                            <div class="absolute inset-0 border-[2px] md:border-[3px] border-brand-400/40 rounded-[10px] md:rounded-[14px] animate-[spin_7s_linear_infinite] group-hover/ring:border-brand-500 transition-colors"></div>
+                            <div class="absolute inset-[3px] border-[1px] md:border-[2px] border-brand-200/60 rounded-[8px] md:rounded-[12px] animate-[spin_5s_linear_infinite_reverse] group-hover/ring:border-brand-400 transition-colors"></div>
+                            <i class="fa-solid fa-lightbulb text-lg md:text-2xl text-brand-600 relative z-10 group-hover/ring:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-center text-[11px] md:text-sm mb-1 md:mb-3"><span class="en">Creativity</span><span class="ar">الإبداع</span></h4>
+                    </div>
+
+                    <div class="group/ring flex flex-col items-center p-3 md:p-4 bg-white rounded-2xl md:rounded-3xl border border-gray-100 hover:border-brand-300 hover:shadow-xl hover:-translate-y-1 md:hover:-translate-y-2 transition-all duration-300 active:scale-95 cursor-pointer">
+                        <div class="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mb-3 md:mb-4">
+                            <div class="absolute inset-1.5 bg-brand-50 rounded-[10px] md:rounded-[14px] transform rotate-45 opacity-80 group-hover/ring:bg-brand-100 transition-colors duration-500"></div>
+                            <div class="absolute inset-0 border-[2px] md:border-[3px] border-brand-400/40 rounded-[10px] md:rounded-[14px] animate-[spin_5s_linear_infinite_reverse] group-hover/ring:border-brand-500 transition-colors"></div>
+                            <div class="absolute inset-[3px] border-[1px] md:border-[2px] border-brand-200/60 rounded-[8px] md:rounded-[12px] animate-[spin_7s_linear_infinite] group-hover/ring:border-brand-400 transition-colors"></div>
+                            <i class="fa-solid fa-briefcase text-lg md:text-2xl text-brand-600 relative z-10 group-hover/ring:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-center text-[10px] md:text-[11px] mb-1 md:mb-3 leading-tight px-1"><span class="en">Adapting to Work Environment</span><span class="ar">التكيف مع بيئة العمل</span></h4>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="courses" class="py-16 md:py-24 relative reveal overflow-hidden text-start">
+        <div class="absolute inset-0 bg-gradient-to-b from-white via-brand-50/50 to-white -z-20"></div>
+        <div class="absolute top-[5%] start-[5%] w-[300px] md:w-[400px] h-[300px] md:h-[400px] bg-brand-200 rounded-full mix-blend-multiply filter blur-[120px] opacity-40 animate-blob -z-10"></div>
+        <div class="absolute bottom-[5%] start-[20%] w-[350px] md:w-[450px] h-[350px] md:h-[450px] bg-brand-100 rounded-full mix-blend-multiply filter blur-[120px] opacity-40 animate-blob animation-delay-4000 -z-10"></div>
+        <div class="absolute inset-0 opacity-[0.03] -z-10" style="background-image: linear-gradient(#6b21a8 1px, transparent 1px), linear-gradient(90deg, #6b21a8 1px, transparent 1px); background-size: 40px 40px;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-12 relative z-10">
+            
+            <div class="flex flex-col items-center mb-12 md:mb-16 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-100/50 border border-brand-200 text-brand-700 font-bold tracking-widest uppercase text-[10px] md:text-xs mb-3 md:mb-4">
+                    <i class="fa-solid fa-shield-halved text-brand-500"></i> 
+                    <span class="en">Verified Certificates</span>
+                    <span class="ar">شهادات معتمدة</span>
+                </div>
+                <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-3 md:mb-4">
+                    <span class="en">Certification </span>
+                    <span class="ar"> الشهادات</span>
+                </h2>
+                <div class="w-20 md:w-24 h-1.5 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300 rounded-full opacity-80"></div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4 md:gap-5">
+                
+                <a href="https://drive.google.com/file/d/1MQY6Xta_SCoqWeo9l5HiyHPS7HjthzIK/view?usp=drive_link" target="_blank" class="block w-full sm:w-[calc(50%-8px)] lg:w-[calc(25%-15px)] group relative rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-b from-gray-200 to-gray-100 p-[1px] hover:from-brand-300 hover:to-brand-600 active:scale-95 transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]">
+                    <div class="relative h-full bg-white rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 flex flex-col overflow-hidden">
+                        <div class="absolute -end-8 -top-8 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                        <i class="fa-solid fa-microchip absolute end-4 md:end-6 top-6 md:top-8 text-4xl md:text-6xl text-gray-100 group-hover:text-brand-100 transition-colors duration-500 z-0 group-hover:rotate-12"></i>
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 flex items-center justify-center mb-4 md:mb-6 relative z-10 shadow-inner shrink-0">
+                            <i class="fa-solid fa-award text-lg md:text-xl text-brand-600"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-base md:text-lg mb-4 leading-snug relative z-10 group-hover:text-brand-900">
+                            <span class="en">The Advanced Artificial Intelligence and Machine Learning Camp</span>
+                            <span class="ar">معسكر الذكاء الاصطناعي وتعلم الآلة المتقدم</span>
+                        </h4>
+                        <div class="mt-auto pt-3 md:pt-4 border-t border-dashed border-gray-200 relative z-10">
+                            <p class="text-[8px] md:text-[9px] font-bold text-brand-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span> <span class="en">Issuer</span><span class="ar">الجهة</span>
+                            </p>
+                            <p class="text-[11px] md:text-xs text-gray-600 font-semibold">
+                                <span class="en">KAUST</span>
+                                <span class="ar">جامعة الملك عبدالله للعلوم والتقنية</span>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://drive.google.com/file/d/1j2CE5R_TAEDr621mL312opqVEf9mOXA2/view?usp=drive_link" target="_blank" class="block w-full sm:w-[calc(50%-8px)] lg:w-[calc(25%-15px)] group relative rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-b from-gray-200 to-gray-100 p-[1px] hover:from-brand-300 hover:to-brand-600 active:scale-95 transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]">
+                    <div class="relative h-full bg-white rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 flex flex-col overflow-hidden">
+                        <div class="absolute -end-8 -top-8 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                        <i class="fa-solid fa-bullhorn absolute end-4 md:end-6 top-6 md:top-8 text-4xl md:text-6xl text-gray-100 group-hover:text-brand-100 transition-colors duration-500 z-0 group-hover:-rotate-12"></i>
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 flex items-center justify-center mb-4 md:mb-6 relative z-10 shadow-inner shrink-0">
+                            <i class="fa-solid fa-certificate text-lg md:text-xl text-brand-600"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-base md:text-lg mb-4 leading-snug relative z-10 group-hover:text-brand-900">
+                            <span class="en">Training Program for Certified Digital Marketing Professional (CDMP)</span>
+                            <span class="ar">برنامج تدريبي للمحترف المعتمد في التسويق الرقمي (CDMP)</span>
+                        </h4>
+                    </div>
+                </a>
+
+                <a href="https://drive.google.com/file/d/1it4hPAEz7m4oQHSdKMoNIr0lHC7HvtSJ/view?usp=drive_link" target="_blank" class="block w-full sm:w-[calc(50%-8px)] lg:w-[calc(25%-15px)] group relative rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-b from-gray-200 to-gray-100 p-[1px] hover:from-brand-300 hover:to-brand-600 active:scale-95 transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]">
+                    <div class="relative h-full bg-white rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 flex flex-col overflow-hidden">
+                        <div class="absolute -end-8 -top-8 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                        <i class="fa-solid fa-brain absolute end-4 md:end-6 top-6 md:top-8 text-4xl md:text-6xl text-gray-100 group-hover:text-brand-100 transition-colors duration-500 z-0 group-hover:rotate-12"></i>
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 flex items-center justify-center mb-4 md:mb-6 relative z-10 shadow-inner shrink-0">
+                            <i class="fa-solid fa-brain text-lg md:text-xl text-brand-600"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-base md:text-lg mb-4 leading-snug relative z-10 group-hover:text-brand-900">
+                            <span class="en">Artificial Intelligence Concepts and Advanced Applications</span>
+                            <span class="ar">مفاهيم الذكاء الاصطناعي وتطبيقاته المتقدمة</span>
+                        </h4>
+                    </div>
+                </a>
+
+                <a href="https://drive.google.com/file/d/1KpGDnDZ4V62fkRL2sDEJQqzp51CWA1Ee/view?usp=drive_link" target="_blank" class="block w-full sm:w-[calc(50%-8px)] lg:w-[calc(25%-15px)] group relative rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-b from-gray-200 to-gray-100 p-[1px] hover:from-brand-300 hover:to-brand-600 active:scale-95 transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]">
+                    <div class="relative h-full bg-white rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 flex flex-col overflow-hidden">
+                        <div class="absolute -end-8 -top-8 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                        <i class="fa-solid fa-robot absolute end-4 md:end-6 top-6 md:top-8 text-4xl md:text-6xl text-gray-100 group-hover:text-brand-100 transition-colors duration-500 z-0 group-hover:-rotate-12"></i>
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 flex items-center justify-center mb-4 md:mb-6 relative z-10 shadow-inner shrink-0">
+                            <i class="fa-solid fa-robot text-lg md:text-xl text-brand-600"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-base md:text-lg mb-4 leading-snug relative z-10 group-hover:text-brand-900">
+                            <span class="en">Fundamentals of Artificial Intelligence</span>
+                            <span class="ar">أساسيات الذكاء الاصطناعي</span>
+                        </h4>
+                    </div>
+                </a>
+
+                <a href="https://drive.google.com/file/d/17deihcuvMu2tQKkTBQOyrsLOPOvkpioz/view?usp=drive_link" target="_blank" class="block w-full sm:w-[calc(50%-8px)] lg:w-[calc(25%-15px)] group relative rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-b from-gray-200 to-gray-100 p-[1px] hover:from-brand-300 hover:to-brand-600 active:scale-95 transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]">
+                    <div class="relative h-full bg-white rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 flex flex-col overflow-hidden">
+                        <div class="absolute -end-8 -top-8 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                        <i class="fa-brands fa-java absolute end-4 md:end-6 top-6 md:top-8 text-4xl md:text-6xl text-gray-100 group-hover:text-brand-100 transition-colors duration-500 z-0 group-hover:rotate-12"></i>
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 flex items-center justify-center mb-4 md:mb-6 relative z-10 shadow-inner shrink-0">
+                            <i class="fa-brands fa-java text-lg md:text-xl text-brand-600"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-base md:text-lg mb-4 leading-snug relative z-10 group-hover:text-brand-900" dir="ltr">
+                            Java Programming Fundamentals
+                        </h4>
+                    </div>
+                </a>
+
+                <a href="https://drive.google.com/file/d/1BpUkpPQYuQr8GbvkdzGsQv-E8jSILe4k/view?usp=drive_link" target="_blank" class="block w-full sm:w-[calc(50%-8px)] lg:w-[calc(25%-15px)] group relative rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-b from-gray-200 to-gray-100 p-[1px] hover:from-brand-300 hover:to-brand-600 active:scale-95 transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]">
+                    <div class="relative h-full bg-white rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 flex flex-col overflow-hidden">
+                        <div class="absolute -end-8 -top-8 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                        <i class="fa-solid fa-file-excel absolute end-4 md:end-6 top-6 md:top-8 text-4xl md:text-6xl text-gray-100 group-hover:text-brand-100 transition-colors duration-500 z-0 group-hover:-rotate-12"></i>
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 flex items-center justify-center mb-4 md:mb-6 relative z-10 shadow-inner shrink-0">
+                            <i class="fa-solid fa-file-excel text-lg md:text-xl text-brand-600"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-base md:text-lg mb-4 leading-snug relative z-10 group-hover:text-brand-900" dir="ltr">
+                            EXCEL PROGRAMM SKILLS
+                        </h4>
+                    </div>
+                </a>
+
+                <a href="https://drive.google.com/file/d/1nN-4HUeJ5fKVVgjbzvj8V5hxZ88QN1-W/view?usp=drive_link" target="_blank" class="block w-full sm:w-[calc(50%-8px)] lg:w-[calc(25%-15px)] group relative rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-b from-gray-200 to-gray-100 p-[1px] hover:from-brand-300 hover:to-brand-600 active:scale-95 transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_rgba(168,85,247,0.2)]">
+                    <div class="relative h-full bg-white rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 flex flex-col overflow-hidden">
+                        <div class="absolute -end-8 -top-8 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                        <i class="fa-solid fa-tower-cell absolute end-4 md:end-6 top-6 md:top-8 text-4xl md:text-6xl text-gray-100 group-hover:text-brand-100 transition-colors duration-500 z-0 group-hover:rotate-12"></i>
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 flex items-center justify-center mb-4 md:mb-6 relative z-10 shadow-inner shrink-0">
+                            <i class="fa-solid fa-network-wired text-lg md:text-xl text-brand-600"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-base md:text-lg mb-4 leading-snug relative z-10 group-hover:text-brand-900">
+                            <span class="en">5G Network and Applications</span>
+                            <span class="ar">شبكات الجيل الخامس وتطبيقاتها</span>
+                        </h4>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="volunteer" class="py-16 md:py-24 relative reveal overflow-hidden text-start bg-brand-50/40 border-y border-brand-100/60">
+        <div class="absolute top-[20%] end-[5%] w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-brand-300 rounded-full mix-blend-multiply filter blur-[100px] md:blur-[150px] opacity-20 animate-blob animation-delay-2000 -z-10"></div>
+        <div class="absolute -bottom-10 -start-10 w-48 md:w-72 h-48 md:h-72 bg-brand-400 rounded-full mix-blend-multiply filter blur-[80px] md:blur-[100px] opacity-10 -z-10"></div>
+
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-12 relative z-10">
+            <div class="flex flex-col items-center mb-12 md:mb-16 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-brand-200 text-brand-600 font-bold tracking-widest uppercase text-[10px] md:text-xs mb-3 md:mb-4 shadow-sm">
+                    <i class="fa-solid fa-hand-holding-heart text-brand-500"></i> 
+                    <span class="en">Community Impact</span>
+                    <span class="ar">الأثر المجتمعي</span>
+                </div>
+                <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-3 md:mb-4">
+                    <span class="en">Volunteer Certificates</span>
+                    <span class="ar">شهادات التطوع</span>
+                </h2>
+                <div class="w-20 md:w-24 h-1.5 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300 mx-auto rounded-full opacity-80"></div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4 md:gap-6 max-w-7xl mx-auto">
+                
+                <div class="w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-16px)] group relative rounded-2xl md:rounded-3xl bg-white/90 backdrop-blur-md border border-brand-100 p-6 md:p-8 hover:border-brand-300 active:scale-[0.98] md:active:scale-100 hover:shadow-[0_20px_40px_rgba(168,85,247,0.15)] transition-all duration-500 overflow-hidden">
+                    <div class="absolute -end-16 -top-16 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                    <div class="absolute top-0 start-0 w-1.5 md:w-2 h-full bg-gradient-to-b from-brand-400 to-brand-600"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4 md:mb-6">
+                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-brand-50 flex items-center justify-center border border-brand-100 group-hover:bg-brand-600 group-hover:text-white transition-colors duration-500 text-brand-500 text-xl md:text-2xl shadow-inner shrink-0">
+                                <i class="fa-solid fa-people-group"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-lg md:text-xl mb-2 md:mb-3 group-hover:text-brand-700 transition-colors">
+                            <span class="en">Organizer at King Khalid University Clubs</span>
+                            <span class="ar">منظمة في نوادي جامعة الملك خالد</span>
+                        </h4>
+                        <p class="text-xs md:text-sm text-gray-600 leading-relaxed font-medium">
+                            <span class="en">Participated as an organizer in the College of Computer Science Club at King Khalid University and the Digital Technology Club.</span>
+                            <span class="ar">شاركت كمنظمة في نادي كليه علوم الحاسب لجامعة الملك خالد ونادي التقنيه الرقميه</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-16px)] group relative rounded-2xl md:rounded-3xl bg-white/90 backdrop-blur-md border border-brand-100 p-6 md:p-8 hover:border-brand-300 active:scale-[0.98] md:active:scale-100 hover:shadow-[0_20px_40px_rgba(168,85,247,0.15)] transition-all duration-500 overflow-hidden">
+                    <div class="absolute -end-16 -top-16 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                    <div class="absolute top-0 start-0 w-1.5 md:w-2 h-full bg-gradient-to-b from-brand-400 to-brand-600"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4 md:mb-6">
+                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-brand-50 flex items-center justify-center border border-brand-100 group-hover:bg-brand-600 group-hover:text-white transition-colors duration-500 text-brand-500 text-xl md:text-2xl shadow-inner shrink-0">
+                                <i class="fa-solid fa-flag"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-lg md:text-xl mb-2 md:mb-3 group-hover:text-brand-700 transition-colors">
+                            <span class="en">Celebration of the 95th Saudi National Day</span>
+                            <span class="ar">الاحتفاء باليوم الوطني السعودي 95</span>
+                        </h4>
+                        <p class="text-xs md:text-sm text-gray-600 leading-relaxed font-medium">
+                            <span class="en">Participated in the celebration of the 95th Saudi National Day by designing a celebratory poster.</span>
+                            <span class="ar">شاركت في الاحتفاء باليوم اليوم الوطني السعودي 95 بتصميم منشور احتفالي</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-16px)] group relative rounded-2xl md:rounded-3xl bg-white/90 backdrop-blur-md border border-brand-100 p-6 md:p-8 hover:border-brand-300 active:scale-[0.98] md:active:scale-100 hover:shadow-[0_20px_40px_rgba(168,85,247,0.15)] transition-all duration-500 overflow-hidden">
+                    <div class="absolute -end-16 -top-16 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                    <div class="absolute top-0 start-0 w-1.5 md:w-2 h-full bg-gradient-to-b from-brand-400 to-brand-600"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4 md:mb-6">
+                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-brand-50 flex items-center justify-center border border-brand-100 group-hover:bg-brand-600 group-hover:text-white transition-colors duration-500 text-brand-500 text-xl md:text-2xl shadow-inner shrink-0">
+                                <i class="fa-solid fa-face-smile"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-lg md:text-xl mb-2 md:mb-3 group-hover:text-brand-700 transition-colors">
+                            <span class="en">"I Am Positive" Initiative</span>
+                            <span class="ar">مبادرة " أنا إيجابي "</span>
+                        </h4>
+                        <p class="text-xs md:text-sm text-gray-600 leading-relaxed font-medium">
+                            <span class="en">Participated in the "I Am Positive" initiative and implemented a number of activities.</span>
+                            <span class="ar">شاركت في مبادرة " أنا إيجابي" نفذت عدد من الانشطه</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-16px)] group relative rounded-2xl md:rounded-3xl bg-white/90 backdrop-blur-md border border-brand-100 p-6 md:p-8 hover:border-brand-300 active:scale-[0.98] md:active:scale-100 hover:shadow-[0_20px_40px_rgba(168,85,247,0.15)] transition-all duration-500 overflow-hidden">
+                    <div class="absolute -end-16 -top-16 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                    <div class="absolute top-0 start-0 w-1.5 md:w-2 h-full bg-gradient-to-b from-brand-400 to-brand-600"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4 md:mb-6">
+                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-brand-50 flex items-center justify-center border border-brand-100 group-hover:bg-brand-600 group-hover:text-white transition-colors duration-500 text-brand-500 text-xl md:text-2xl shadow-inner shrink-0">
+                                <i class="fa-solid fa-pills"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-lg md:text-xl mb-2 md:mb-3 group-hover:text-brand-700 transition-colors">
+                            <span class="en">Volunteer in Antibiotic Awareness Campaign</span>
+                            <span class="ar">متطوعة في حملة توعوية بالمضادات الحيوية</span>
+                        </h4>
+                        <p class="text-xs md:text-sm text-gray-600 leading-relaxed font-medium">
+                            <span class="en">Participated in an antibiotic awareness campaign.</span>
+                            <span class="ar">شاركت في حملة توعوية بالمضادات الحيوية</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-[calc(33.333%-16px)] group relative rounded-2xl md:rounded-3xl bg-white/90 backdrop-blur-md border border-brand-100 p-6 md:p-8 hover:border-brand-300 active:scale-[0.98] md:active:scale-100 hover:shadow-[0_20px_40px_rgba(168,85,247,0.15)] transition-all duration-500 overflow-hidden">
+                    <div class="absolute -end-16 -top-16 w-24 md:w-32 h-24 md:h-32 bg-brand-50 rounded-full group-hover:scale-[2.5] md:group-hover:scale-[3] transition-transform duration-700 ease-out opacity-50 z-0"></div>
+                    <div class="absolute top-0 start-0 w-1.5 md:w-2 h-full bg-gradient-to-b from-brand-400 to-brand-600"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4 md:mb-6">
+                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-brand-50 flex items-center justify-center border border-brand-100 group-hover:bg-brand-600 group-hover:text-white transition-colors duration-500 text-brand-500 text-xl md:text-2xl shadow-inner shrink-0">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-display font-bold text-gray-900 text-lg md:text-xl mb-2 md:mb-3 group-hover:text-brand-700 transition-colors">
+                            <span class="en">"Pictures That Speak" Exhibition</span>
+                            <span class="ar">معرض صور تحكي</span>
+                        </h4>
+                        <p class="text-xs md:text-sm text-gray-600 leading-relaxed font-medium">
+                            <span class="en">Participated in the "Pictures That Speak" exhibition by submitting a photograph.</span>
+                            <span class="ar">شاركت في معرض صور تحكي من خلال تقديم صورة فوتوغرافية</span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact" class="bg-[#030712] text-white pt-20 md:pt-32 pb-8 md:pb-12 relative overflow-hidden text-center z-10 border-t border-white/5 dark-theme-section">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] md:w-[800px] h-[200px] md:h-[400px] bg-brand-600/20 rounded-full blur-[80px] md:blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-blue-600/10 rounded-full blur-[80px] md:blur-[120px] pointer-events-none"></div>
+        <div class="absolute top-1/2 right-0 w-[250px] md:w-[400px] h-[250px] md:h-[400px] bg-brand-400/10 rounded-full blur-[80px] md:blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-5xl mx-auto px-4 md:px-6 relative z-10">
+            <div class="inline-flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6 md:mb-8">
+                <span class="relative flex h-2 w-2 md:h-2.5 md:w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-green-500 shadow-[0_0_8px_#22c55e]"></span>
+                </span>
+                <span class="text-gray-300 font-medium tracking-wider text-[10px] md:text-xs uppercase">
+                    <span class="en">Open for opportunities</span>
+                    <span class="ar">متاحة للفرص المهنية</span>
+                </span>
+            </div>
+
+            <h2 class="text-4xl sm:text-5xl md:text-7xl font-display font-extrabold mb-4 md:mb-6 tracking-tight">
+                <span class="en">Let's <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 via-brand-400 to-brand-600">Connect</span></span>
+                <span class="ar">لنكن على <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 via-brand-400 to-brand-600">تواصل</span></span>
+            </h2>
+            <p class="text-gray-400 mb-10 md:mb-12 text-sm md:text-xl leading-relaxed max-w-2xl mx-auto font-light px-4">
+                <span class="en">Interested in AI, Intelligent Systems, or have a project in mind? I'd love to hear from you.</span>
+                <span class="ar">هل أنت مهتم بالذكاء الاصطناعي، الأنظمة الذكية، أو لديك فكرة مشروع؟ يسعدني التواصل معك.</span>
+            </p>
+
+            <div class="relative max-w-2xl mx-auto mb-10 md:mb-16 group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-brand-500 to-brand-300 rounded-[2rem] md:rounded-[2.5rem] blur opacity-20 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <a href="mailto:salqahtani2900@gmail.com" class="relative flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 px-6 py-5 md:px-8 md:py-6 bg-[#0f172a]/90 backdrop-blur-xl rounded-[1.8rem] md:rounded-[2rem] border border-white/10 hover:border-brand-400/50 transition-all duration-500 active:scale-95 shadow-2xl">
+                    <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-center md:text-start">
+                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white shadow-lg shadow-brand-500/25 shrink-0">
+                            <i class="fa-solid fa-paper-plane text-xl md:text-2xl group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </div>
+                        <div>
+                            <p class="text-brand-300 text-[10px] md:text-sm font-bold tracking-widest uppercase mb-1">
+                                <span class="en">Drop a message</span>
+                                <span class="ar">أرسل رسالة</span>
+                            </p>
+                            <h3 class="text-lg sm:text-xl md:text-3xl font-display font-bold text-white tracking-wide break-all">
+                                salqahtani2900@gmail.com
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex w-12 h-12 rounded-full bg-white/5 items-center justify-center border border-white/10 group-hover:bg-brand-500 group-hover:border-brand-400 transition-colors duration-300 shrink-0">
+                        <i class="fa-solid fa-arrow-right -rotate-45 rtl:rotate-45 text-white"></i>
+                    </div>
+                </a>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4 md:gap-6 mb-16 md:mb-24">
+                <a href="https://www.linkedin.com/in/sarah-alqahtani-410820357/" target="_blank" class="w-full sm:w-[calc(50%-8px)] lg:w-auto min-w-[200px] lg:min-w-[240px] group relative p-1 rounded-2xl md:rounded-3xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#0077b5]/50 transition-all duration-300 active:scale-95 backdrop-blur-md shadow-lg hover:shadow-[0_15px_30px_rgba(0,119,181,0.2)]">
+                    <div class="px-4 py-4 md:px-6 md:py-5 flex items-center gap-3 md:gap-4">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-[#0077b5] group-hover:bg-[#0077b5]/10 transition-colors shrink-0">
+                            <i class="fa-brands fa-linkedin-in text-xl md:text-2xl"></i>
+                        </div>
+                        <div class="text-start">
+                            <h4 class="text-white font-bold text-base md:text-lg"><span class="en">LinkedIn</span><span class="ar">لينكد إن</span></h4>
+                            <p class="text-gray-500 text-xs md:text-sm group-hover:text-gray-300 transition-colors">SarahAlqahtani</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://github.com/sarahalqahtani2026" target="_blank" class="w-full sm:w-[calc(50%-8px)] lg:w-auto min-w-[200px] lg:min-w-[240px] group relative p-1 rounded-2xl md:rounded-3xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/50 transition-all duration-300 active:scale-95 backdrop-blur-md shadow-lg hover:shadow-[0_15px_30px_rgba(255,255,255,0.1)]">
+                    <div class="px-4 py-4 md:px-6 md:py-5 flex items-center gap-3 md:gap-4">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:bg-white transition-colors shrink-0">
+                            <i class="fa-brands fa-github text-xl md:text-2xl"></i>
+                        </div>
+                        <div class="text-start">
+                            <h4 class="text-white font-bold text-base md:text-lg"><span class="en">GitHub</span><span class="ar">جيت هب</span></h4>
+                            <p class="text-gray-500 text-xs md:text-sm group-hover:text-gray-300 transition-colors truncate max-w-[150px] md:max-w-none">sarahalqahtani2026</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Changed Phone Link to a Button that triggers Modal -->
+                <button onclick="togglePhoneModal()" class="text-start w-full sm:w-[calc(50%-8px)] lg:w-auto min-w-[200px] lg:min-w-[240px] group relative p-1 rounded-2xl md:rounded-3xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-green-500/50 transition-all duration-300 active:scale-95 backdrop-blur-md shadow-lg hover:shadow-[0_15px_30px_rgba(34,197,94,0.15)]">
+                    <div class="px-4 py-4 md:px-6 md:py-5 flex items-center gap-3 md:gap-4">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-green-400 group-hover:bg-green-500/10 transition-colors shrink-0">
+                            <i class="fa-solid fa-phone text-lg md:text-xl"></i>
+                        </div>
+                        <div class="text-start">
+                            <h4 class="text-white font-bold text-base md:text-lg"><span class="en">Phone / WhatsApp</span><span class="ar">الهاتف / واتساب</span></h4>
+                            <p class="text-gray-500 text-xs md:text-sm group-hover:text-gray-300 transition-colors" dir="ltr">+966 53 226 5595</p>
+                        </div>
+                    </div>
+                </button>
+            </div>
+
+            <div class="pt-6 md:pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
+                <div class="flex items-center gap-2 md:gap-3 bg-white/5 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-white/5 hover:border-brand-500/30 transition-colors duration-300">
+                    <i class="fa-solid fa-code text-brand-400 text-xs md:text-sm"></i>
+                    <span class="text-gray-400 text-xs md:text-sm font-medium">
+                        <span class="en">Intelligent Systems Track</span>
+                        <span class="ar">مسار الأنظمة الذكية</span>
+                    </span>
+                </div>
+                <p class="text-gray-500 text-xs md:text-sm flex items-center gap-2 text-center">
+                    <span class="en">&copy; All rights reserved to Sarah Al-Qahtani, 2026</span>
+                    <span class="ar">&copy; جميع الحقوق محفوظة لسارة القحطاني، ٢٠٢٦</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Phone Options Modal -->
+    <div id="phone-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-4 sm:p-6">
+        <!-- Enhanced Backdrop with deeper blur -->
+        <div class="absolute inset-0 bg-[#030712]/80 backdrop-blur-md transition-opacity duration-500 opacity-0" id="phone-modal-backdrop" onclick="togglePhoneModal()"></div>
+        
+        <!-- Premium Glassmorphism Modal Content -->
+        <div class="relative bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-6 md:p-8 w-full max-w-sm shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7),0_0_40px_-10px_rgba(147,51,234,0.25)] transform scale-95 opacity-0 transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)" id="phone-modal-content">
+            
+            <!-- Decorative glowing blur behind modal -->
+            <div class="absolute -top-24 -start-24 w-48 h-48 bg-brand-600 rounded-full mix-blend-lighten filter blur-[80px] opacity-30 pointer-events-none"></div>
+            <div class="absolute -bottom-24 -end-24 w-48 h-48 bg-[#25D366] rounded-full mix-blend-lighten filter blur-[80px] opacity-10 pointer-events-none"></div>
+
+            <div class="relative z-10 text-center mb-8">
+                <div class="relative w-16 h-16 md:w-20 md:h-20 mx-auto mb-5 md:mb-6">
+                    <div class="absolute inset-0 bg-brand-500 rounded-2xl md:rounded-3xl rotate-45 blur opacity-40 animate-pulse"></div>
+                    <div class="relative flex items-center justify-center w-full h-full bg-gradient-to-br from-[#1e293b] to-[#0f172a] border border-white/10 rounded-2xl md:rounded-3xl shadow-xl">
+                        <i class="fa-solid fa-satellite-dish text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-brand-500"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-white font-display tracking-wide mb-2">
+                    <span class="en">Communication Hub</span>
+                    <span class="ar">مركز التواصل</span>
+                </h3>
+                <p class="text-gray-400 text-xs md:text-sm">
+                    <span class="en">Select your preferred method to connect</span>
+                    <span class="ar">اختر وسيلة التواصل المفضلة لديك</span>
+                </p>
+            </div>
+            
+            <div class="relative z-10 flex flex-col gap-3 md:gap-4">
+                <!-- Direct Call Button -->
+                <a href="tel:0532265595" class="group relative w-full flex items-center justify-between p-1 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-400/50 transition-all duration-300 active:scale-95 shadow-lg overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-brand-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    <div class="flex items-center gap-3 md:gap-4 px-3 md:px-4 py-2.5 md:py-3 relative z-10 w-full">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#1e293b] flex items-center justify-center text-brand-400 group-hover:bg-brand-500 group-hover:text-white border border-white/5 transition-all duration-300 shadow-inner shrink-0">
+                            <i class="fa-solid fa-phone-volume text-base md:text-lg group-hover:-rotate-12 transition-transform"></i>
+                        </div>
+                        <div class="text-start flex-1">
+                            <h4 class="text-white font-bold text-sm md:text-base"><span class="en">Direct Call</span><span class="ar">مكالمة هاتفية</span></h4>
+                            <p class="text-gray-400 text-[10px] md:text-xs mt-0.5 group-hover:text-brand-200 transition-colors" dir="ltr">+966 53 226 5595</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-gray-500 text-sm group-hover:text-white -rotate-45 rtl:rotate-45 transition-colors"></i>
+                    </div>
+                </a>
+                
+                <!-- WhatsApp Button -->
+                <a href="https://wa.me/966532265595" target="_blank" class="group relative w-full flex items-center justify-between p-1 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#25D366]/50 transition-all duration-300 active:scale-95 shadow-lg overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#25D366]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    <div class="flex items-center gap-3 md:gap-4 px-3 md:px-4 py-2.5 md:py-3 relative z-10 w-full">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#1e293b] flex items-center justify-center text-[#25D366] group-hover:bg-[#25D366] group-hover:text-white border border-white/5 transition-all duration-300 shadow-inner shrink-0">
+                            <i class="fa-brands fa-whatsapp text-lg md:text-xl group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <div class="text-start flex-1">
+                            <h4 class="text-white font-bold text-sm md:text-base"><span class="en">WhatsApp</span><span class="ar">واتساب</span></h4>
+                            <p class="text-gray-400 text-[10px] md:text-xs mt-0.5 group-hover:text-[#bbf7d0] transition-colors">
+                                <span class="en">Send a message</span>
+                                <span class="ar">مراسلة فورية</span>
+                            </p>
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-gray-500 text-sm group-hover:text-white -rotate-45 rtl:rotate-45 transition-colors"></i>
+                    </div>
+                </a>
+            </div>
+            
+            <button onclick="togglePhoneModal()" class="relative z-10 mt-6 w-full py-2.5 md:py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl font-bold transition-all duration-300 border border-transparent hover:border-white/10 tracking-widest uppercase text-[10px] md:text-xs">
+                <span class="en">Cancel & Close</span>
+                <span class="ar">إلغاء وإغلاق</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Prevent Browser from Saving Scroll Position ---
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+
+        // --- Phone Modal Toggle Logic ---
+        function togglePhoneModal() {
+            const modal = document.getElementById('phone-modal');
+            const content = document.getElementById('phone-modal-content');
+            const backdrop = document.getElementById('phone-modal-backdrop');
+
+            if (modal.classList.contains('hidden')) {
+                // Show modal
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                // Small timeout to allow display:flex to apply before animating opacity/transform
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    backdrop.classList.add('opacity-100');
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                // Hide modal
+                backdrop.classList.remove('opacity-100');
+                backdrop.classList.add('opacity-0');
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                // Wait for animation to finish before hiding container
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 500); // Matches the updated duration-500 animation
+            }
+        }
+
+        // --- Mobile Menu Toggle ---
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            if(mobileMenu.classList.contains('active')){
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Close menu on link click
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                const icon = mobileMenuBtn.querySelector('i');
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            });
+        });
+
+        // --- Language Toggle System ---
+        const langBtn = document.getElementById('lang-btn');
+        let currentLang = 'en';
+
+        langBtn.addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            langBtn.innerText = currentLang === 'en' ? 'عربي' : 'EN';
+            
+            resetTypewriters();
+        });
+
+        // Exact Typewriter Translations
+        const terminalTexts = {
+            en: "Computer Science student specializing in Intelligent Systems. Interested in Artificial Intelligence, Machine Learning, and Software Development. Passionate about building real-world projects and solving technical problems, with a creative interest in photography and design.",
+            ar: "طالبة علوم حاسب متخصصة في الأنظمة الذكية. مهتمة بالذكاء الاصطناعي، وتعلم الآلة، وتطوير البرمجيات. شغوفة ببناء مشاريع حقيقية وحل المشكلات التقنية، ولدي اهتمامات إبداعية في التصوير والتصميم."
+        };
+
+        const subtitleArrays = {
+            en: ["Intelligent Systems Track", "Artificial Intelligence Specialization", "Machine Learning Enthusiast"],
+            ar: ["مسار الأنظمة الذكية", "تخصص الذكاء الاصطناعي", "شغوفة بتعلم الآلة"]
+        };
+
+        // Typewriter 1: Terminal Summary
+        const terminalOutput = document.getElementById('terminal-output');
+        let terminalTimeout;
+        
+        function typeTerminal(lang, index = 0) {
+            if (index === 0) terminalOutput.innerHTML = '';
+            const text = terminalTexts[lang];
+            
+            if (index < text.length) {
+                terminalOutput.innerHTML += text.charAt(index);
+                terminalTimeout = setTimeout(() => typeTerminal(lang, index + 1), Math.random() * 30 + 20);
+            }
+        }
+
+        // Typewriter 2: Rotating Hero Subtitle
+        const subtitleOutput = document.getElementById('subtitle-typewriter');
+        let subtitleWordIndex = 0;
+        let subtitleCharIndex = 0;
+        let isDeleting = false;
+        let subtitleTimeout;
+
+        function typeSubtitle() {
+            const currentArray = subtitleArrays[currentLang];
+            const currentWord = currentArray[subtitleWordIndex % currentArray.length];
+            
+            if (isDeleting) {
+                subtitleOutput.innerHTML = currentWord.substring(0, subtitleCharIndex - 1);
+                subtitleCharIndex--;
+            } else {
+                subtitleOutput.innerHTML = currentWord.substring(0, subtitleCharIndex + 1);
+                subtitleCharIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 30 : 80;
+
+            if (!isDeleting && subtitleCharIndex === currentWord.length) {
+                typeSpeed = 2000; 
+                isDeleting = true;
+            } else if (isDeleting && subtitleCharIndex === 0) {
+                isDeleting = false;
+                subtitleWordIndex++;
+                typeSpeed = 500; 
+            }
+
+            subtitleTimeout = setTimeout(typeSubtitle, typeSpeed);
+        }
+
+        function resetTypewriters() {
+            clearTimeout(terminalTimeout);
+            clearTimeout(subtitleTimeout);
+            subtitleWordIndex = 0;
+            subtitleCharIndex = 0;
+            isDeleting = false;
+            subtitleOutput.innerHTML = '';
+            
+            typeTerminal(currentLang);
+            typeSubtitle();
+        }
+
+        resetTypewriters();
+
+        // --- ULTRA-FAST GPU Accelerated Custom Cursor ---
+        const cursor = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursor-dot');
+        
+        // Only run logic if custom cursor is active (not on mobile)
+        if(window.matchMedia("(pointer: fine)").matches) {
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+            }, { passive: true });
+
+            const interactables = document.querySelectorAll('a, button, .hover-effect, .group, input, textarea');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover-active'), { passive: true });
+                el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover-active'), { passive: true });
+            });
+        }
+
+        // --- Optimized Navbar Scroll Effect (Debounced with rAF) ---
+        const navbarContainer = document.getElementById('navbar-container');
+        const navbar = document.getElementById('navbar');
+        const darkSections = document.querySelectorAll('.dark-theme-section');
+        let isScrolling = false;
+
+        window.addEventListener('scroll', () => {
+            if (!isScrolling) {
+                window.requestAnimationFrame(() => {
+                    // Glassmorphism logic
+                    if (window.scrollY > 30) {
+                        navbar.style.background = 'rgba(255, 255, 255, 0.2)'; 
+                        navbar.style.backdropFilter = 'blur(16px)';
+                        navbar.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                        navbar.classList.add('shadow-lg');
+                        mobileMenu.style.background = 'rgba(255, 255, 255, 0.9)';
+                        mobileMenu.style.backdropFilter = 'blur(16px)';
+                    } else {
+                        navbar.style.background = 'rgba(255, 255, 255, 0.85)'; 
+                        navbar.style.backdropFilter = 'blur(12px)';
+                        navbar.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                        navbar.classList.remove('shadow-lg');
+                        mobileMenu.style.background = 'transparent';
+                    }
+
+                    // Smart dark mode detection
+                    const navbarRect = navbarContainer.getBoundingClientRect();
+                    const navbarMiddleY = navbarRect.top + (navbarRect.height / 2);
+                    let isOverDark = false;
+                    
+                    darkSections.forEach(section => {
+                        const rect = section.getBoundingClientRect();
+                        if (navbarMiddleY >= rect.top && navbarMiddleY <= rect.bottom) {
+                            isOverDark = true;
+                        }
+                    });
+
+                    if (isOverDark) {
+                        navbarContainer.classList.add('navbar-dark-mode');
+                    } else {
+                        navbarContainer.classList.remove('navbar-dark-mode');
+                    }
+                    isScrolling = false;
+                });
+                isScrolling = true;
+            }
+        }, { passive: true });
+
+        // Trigger once on load
+        window.dispatchEvent(new Event('scroll'));
+
+        // --- OPTIMIZED Scroll Reveal Animation using IntersectionObserver ---
+        const revealOptions = {
+            threshold: 0.05, // Lower threshold for mobile
+            rootMargin: "0px 0px -20px 0px"
+        };
+        
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, revealOptions);
+
+        document.querySelectorAll('.reveal').forEach(reveal => {
+            revealObserver.observe(reveal);
+        });
+
+        // --- OPTIMIZED Interactive Canvas Network Background ---
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+
+        // Track mouse for canvas even if cursor is hidden
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        }, {passive: true});
+
+        function resize() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+            initParticles(); 
+        }
+        window.addEventListener('resize', resize, { passive: true }); 
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1; 
+                this.speedX = Math.random() * 0.6 - 0.3; // Slower for mobile
+                this.speedY = Math.random() * 0.6 - 0.3;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+                
+                let dx = mouseX - this.x; let dy = mouseY - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 120) { // Reduced interaction radius
+                    const forceDirectionX = dx / distance; const forceDirectionY = dy / distance;
+                    const force = (120 - distance) / 120;
+                    this.x -= forceDirectionX * force * 1.2; 
+                    this.y -= forceDirectionY * force * 1.2;
+                }
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#c084fc'; ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            // Strictly cap particles on mobile (width < 768)
+            const isMobile = window.innerWidth < 768;
+            const maxParticles = isMobile ? 40 : 100;
+            let numberOfParticles = Math.min((canvas.height * canvas.width) / 20000, maxParticles);
+            for (let i = 0; i < numberOfParticles; i++) particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update(); 
+                particles[i].draw();
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x; 
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 100) { // Reduced line connection distance
+                        ctx.beginPath(); ctx.strokeStyle = `rgba(168, 85, 247, ${0.8 - distance/100})`;
+                        ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles); 
+        }
+        initParticles(); 
+        requestAnimationFrame(animateParticles);
+
+        // --- 3D Tilt Effect for Project Card (Disabled on mobile for performance) ---
+        if(window.matchMedia("(min-width: 1024px)").matches) {
+            const projectCard = document.getElementById('project-card');
+            const tiltContainer = document.querySelector('.tilt-card-container');
+
+            if(projectCard && tiltContainer) {
+                tiltContainer.addEventListener('mousemove', (e) => {
+                    const rect = tiltContainer.getBoundingClientRect();
+                    const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2; const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -5;
+                    const rotateY = ((x - centerX) / centerX) * 5;
+                    projectCard.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                }, { passive: true });
+                tiltContainer.addEventListener('mouseleave', () => {
+                    projectCard.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    projectCard.style.transition = 'transform 0.5s ease-out';
+                }, { passive: true });
+                tiltContainer.addEventListener('mouseenter', () => { projectCard.style.transition = 'transform 0.1s ease-out'; }, { passive: true });
+            }
+        }
+
+    </script>
+</body>
+</html>
